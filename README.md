@@ -1,3 +1,13 @@
+---
+title: GyanSetu
+emoji: 🎓
+colorFrom: green
+colorTo: blue
+sdk: docker
+app_file: frontend/app.py
+pinned: false
+---
+
 # GyanSetu — জ্ঞানের সেতু 🎓
 ### RAG Powered Research Assistant for Bangladeshi Students
 
