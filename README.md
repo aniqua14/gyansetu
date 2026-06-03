@@ -17,7 +17,11 @@ about scholarships, university admissions, research papers, and
 studying abroad — in English or Bangla.
 
 ---
+## 🚀 Live Demo
 
+👉 **[Try GyanSetu on Hugging Face Spaces](https://huggingface.co/spaces/aniqua-nawar/gyansetu)**
+
+---
 ## What is RAG?
 Large Language Models (LLMs) hallucinate — they generate confident 
 but false answers when asked about specific facts. RAG (Retrieval 
@@ -191,8 +195,10 @@ streamlit run frontend/app.py
 ## Author
 
 Built by Aniqua Nawar — CS Graduate, Bangladesh
-Previous project: BanglaMind (Bangla LLM fine-tuning)
+- 🤗 [Hugging Face](https://huggingface.co/aniqua-nawar)
+- 💻 [GitHub](https://github.com/aniqua14)
 
+Previous project: BanglaMind (Bangla LLM fine-tuning)
 ---
 
 ## License
