@@ -1,7 +1,11 @@
 # frontend/app.py
 import streamlit as st
+import requests
+import os
 from llm.generator import generate_answer
 from vectorstore.store import get_collection, get_collection_stats
+
+BACKEND_URL = os.environ.get("GYANSETU_API_URL", "http://localhost:8000")
 
 # ── URLs for auto-ingestion on cold start ─────────────────────
 URLS = [
@@ -79,6 +83,40 @@ with st.sidebar:
     st.divider()
     st.markdown("### 🌐 Supported Languages")
     st.markdown("🇬🇧 English  |  🇧🇩 বাংলা")
+
+    st.divider()
+    st.markdown("### 🌍 Ingest a URL")
+    ingest_url = st.text_input(
+        "Paste any URL to add its content to the knowledge base",
+        placeholder="https://example.com/article",
+        label_visibility="collapsed",
+    )
+    if st.button("📥 Ingest URL", type="primary", use_container_width=True):
+        if not ingest_url:
+            st.error("Please enter a URL first.")
+        else:
+            with st.spinner("Scraping, chunking, and embedding..."):
+                try:
+                    resp = requests.post(
+                        f"{BACKEND_URL}/ingest-url",
+                        json={"url": ingest_url},
+                        timeout=120,
+                    )
+                    data = resp.json()
+                    if resp.status_code == 200:
+                        if data["chunks_added"]:
+                            st.success(
+                                f"✅ Added {data['chunks_added']} chunks "
+                                f"from your URL to the knowledge base."
+                            )
+                        else:
+                            st.info(f"ℹ️ {data['message']}")
+                    else:
+                        st.error(f"❌ {data['detail']}")
+                except requests.ConnectionError:
+                    st.error("❌ Could not reach the API server. Is it running?")
+                except Exception as e:
+                    st.error(f"❌ Something went wrong: {str(e)}")
 
     st.divider()
     st.caption(

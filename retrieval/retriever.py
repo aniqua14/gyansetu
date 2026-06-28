@@ -14,35 +14,40 @@ def retrieve(query: str, top_k: int = TOP_K) -> list[dict]:
 
     Steps:
     1. Embed the query into a vector (same model used during ingestion)
-    2. Ask ChromaDB to find the nearest vectors using cosine similarity
-    3. Return the chunks with their text, source, and similarity score
+    2. Ask ChromaDB for a wider pool of nearest vectors using cosine similarity —
+       wider than top_k, so smaller/newer sources aren't crowded out by the
+       much larger static collection
+    3. Filter out near-noise matches, then sort and trim to top_k
     """
 
     # Step 1 — embed the query
     query_vector = embed_query(query)
 
-    # Step 2 — search ChromaDB
+    # Step 2 — search ChromaDB with a wider pool than top_k
+    # (so dynamically-ingested content has a fair chance to surface,
+    # even when the static collection is much larger)
+    candidate_pool_size = max(top_k * 5, 20)
+
     collection = get_collection()
     results = collection.query(
         query_embeddings=[query_vector],
-        n_results=top_k,
+        n_results=candidate_pool_size,
         include=["documents", "metadatas", "distances"]
     )
 
-    # Step 3 — format results into clean dicts
-    chunks = []
-    documents = results["documents"][0]   # list of chunk texts
-    metadatas = results["metadatas"][0]   # list of metadata dicts
-    # list of distances (lower = more similar)
+    # Step 3 — filter, then sort by similarity, then trim to top_k
+    documents = results["documents"][0]
+    metadatas = results["metadatas"][0]
     distances = results["distances"][0]
 
+    candidates = []
     for text, metadata, distance in zip(documents, metadatas, distances):
         similarity = 1 - distance
 
-        if similarity < 0.5:      # chunk is not relevant enough, skip it
+        if similarity < 0.15:     # filters out only total noise; let the LLM judge real relevance
             continue
 
-        chunks.append({
+        candidates.append({
             "text":        text,
             "source":      metadata["source"],
             "type":        metadata["type"],
@@ -50,8 +55,8 @@ def retrieve(query: str, top_k: int = TOP_K) -> list[dict]:
             "similarity":  round(similarity, 4)
         })
 
-    return chunks
-
+    candidates.sort(key=lambda c: c["similarity"], reverse=True)
+    return candidates[:top_k]
 
 def format_context(chunks: list[dict]) -> str:
     """

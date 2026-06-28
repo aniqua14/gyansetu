@@ -64,6 +64,36 @@ def load_webpage(url: str) -> dict:
     }
 
 
+def load_webpage_dynamic(url: str) -> dict:
+    """
+    Fetches a webpage and extracts clean readable text using trafilatura,
+    with fallback to the existing BeautifulSoup approach. Designed for the
+    dynamic URL ingestion path where content quality varies across arbitrary pages.
+    """
+    headers = {
+        "User-Agent": "Mozilla/5.0 (compatible; BanglaRAG/1.0)"
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+    response.raise_for_status()
+
+    # Try trafilatura first — purpose-built for clean article extraction
+    try:
+        import trafilatura
+        text = trafilatura.extract(response.text)
+        if text and len(text) >= 200:
+            return {
+                "text": text,
+                "source": url,
+                "type": "webpage"
+            }
+    except Exception as e:
+        print(f"[loader] trafilatura failed for {url}: {e}")
+
+    # Fallback to existing BeautifulSoup logic
+    return load_webpage(url)
+
+
 def load_all_pdfs(folder_path: Path = DATA_RAW) -> list[dict]:
     """
     Loads every PDF found in the data/raw/ folder.

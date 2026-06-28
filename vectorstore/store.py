@@ -21,13 +21,16 @@ def get_collection():
     return collection
 
 
-def add_chunks(collection, chunks: list[dict], embeddings: list[list[float]]):
+def add_chunks(collection, chunks: list[dict], embeddings: list[list[float]], source_type: str = "static"):
     """
     Stores chunks and their embeddings into ChromaDB.
     Uses a hash of the text as ID to prevent duplicates —
     if the same chunk is ingested twice, it just overwrites.
+
+    source_type distinguishes static (built-in) from dynamic (user-submitted) content.
     """
     import hashlib
+    from datetime import datetime, timezone
 
     ids = [
         hashlib.md5(
@@ -37,11 +40,15 @@ def add_chunks(collection, chunks: list[dict], embeddings: list[list[float]]):
     ]
 
     documents = [chunk["text"] for chunk in chunks]
+    ingested_at = datetime.now(timezone.utc).isoformat()
     metadatas = [
         {
             "source":      chunk["source"],
+            "source_url":  chunk["source"],
             "type":        chunk["type"],
             "chunk_index": chunk["chunk_index"],
+            "source_type": source_type,
+            "ingested_at": ingested_at,
         }
         for chunk in chunks
     ]
