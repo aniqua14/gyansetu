@@ -32,5 +32,5 @@ COLLECTION_NAME = "gyansetu_docs"
 # os.environ.get checks system environment first (HuggingFace secrets)
 # falls back to .env file locally
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
-GROQ_MODEL = "llama-3.1-8b-instant"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 MAX_TOKENS = 1024

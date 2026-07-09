@@ -119,6 +119,41 @@ with st.sidebar:
                     st.error(f"❌ Something went wrong: {str(e)}")
 
     st.divider()
+    st.markdown("### 📄 Upload a PDF")
+    uploaded_file = st.file_uploader(
+        "Upload a PDF to add to the knowledge base",
+        type="pdf",
+        label_visibility="collapsed",
+    )
+    if st.button("📄 Ingest PDF", type="primary", use_container_width=True):
+        if uploaded_file is None:
+            st.error("Please select a PDF file first.")
+        else:
+            with st.spinner("Extracting, chunking, and embedding..."):
+                try:
+                    file_bytes = uploaded_file.read()
+                    resp = requests.post(
+                        f"{BACKEND_URL}/ingest-pdf",
+                        files={"file": (uploaded_file.name, file_bytes, "application/pdf")},
+                        timeout=120,
+                    )
+                    data = resp.json()
+                    if resp.status_code == 200:
+                        if data["chunks_added"]:
+                            st.success(
+                                f"✅ Added {data['chunks_added']} chunks "
+                                f"from your PDF to the knowledge base."
+                            )
+                        else:
+                            st.info(f"ℹ️ {data['message']}")
+                    else:
+                        st.error(f"❌ {data['detail']}")
+                except requests.ConnectionError:
+                    st.error("❌ Could not reach the API server. Is it running?")
+                except Exception as e:
+                    st.error(f"❌ Something went wrong: {str(e)}")
+
+    st.divider()
     st.caption(
         "Built with LangChain · ChromaDB · "
         "HuggingFace · Groq · Streamlit"
