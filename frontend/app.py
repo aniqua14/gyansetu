@@ -134,7 +134,8 @@ with st.sidebar:
                     file_bytes = uploaded_file.read()
                     resp = requests.post(
                         f"{BACKEND_URL}/ingest-pdf",
-                        files={"file": (uploaded_file.name, file_bytes, "application/pdf")},
+                        files={"file": (uploaded_file.name,
+                                        file_bytes, "application/pdf")},
                         timeout=120,
                     )
                     data = resp.json()

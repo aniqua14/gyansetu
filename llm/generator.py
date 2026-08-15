@@ -48,6 +48,7 @@ def translate_to_english(query: str) -> str:
             model=GROQ_MODEL,
             messages=[{"role": "user", "content": prompt_simple}],
             max_tokens=200,
+            reasoning_effort="low",
             temperature=0,
         )
         translated = response.choices[0].message.content.strip()
@@ -82,6 +83,7 @@ def translate_to_english(query: str) -> str:
             model=GROQ_MODEL,
             messages=[{"role": "user", "content": prompt_fewshot}],
             max_tokens=200,
+            reasoning_effort="low",
             temperature=0,
         )
         translated = response.choices[0].message.content.strip()
@@ -158,6 +160,7 @@ def generate_answer(query: str, bangla: bool = None) -> dict:
             {"role": "user", "content": prompt}
         ],
         max_tokens=MAX_TOKENS,
+        reasoning_effort="low",
         temperature=0.2,
     )
 

@@ -24,6 +24,7 @@ CHUNK_OVERLAP = 50    # overlap between adjacent chunks
 
 # ── Retrieval ──────────────────────────────────────────────────
 TOP_K = 4             # number of chunks to retrieve per query
+SIMILARITY_THRESHOLD = 0.4   # min similarity to include a chunk for generation
 
 # ── ChromaDB ──────────────────────────────────────────────────
 COLLECTION_NAME = "gyansetu_docs"
@@ -32,5 +33,5 @@ COLLECTION_NAME = "gyansetu_docs"
 # os.environ.get checks system environment first (HuggingFace secrets)
 # falls back to .env file locally
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
 MAX_TOKENS = 1024

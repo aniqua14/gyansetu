@@ -1,5 +1,5 @@
 # retrieval/retriever.py
-from config import TOP_K
+from config import TOP_K, SIMILARITY_THRESHOLD
 from vectorstore.store import get_collection
 from ingestion.embedder import embed_query
 from pathlib import Path
@@ -44,7 +44,7 @@ def retrieve(query: str, top_k: int = TOP_K) -> list[dict]:
     for text, metadata, distance in zip(documents, metadatas, distances):
         similarity = 1 - distance
 
-        if similarity < 0.15:     # filters out only total noise; let the LLM judge real relevance
+        if similarity < SIMILARITY_THRESHOLD:
             continue
 
         candidates.append({

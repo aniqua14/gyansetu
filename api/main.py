@@ -1,4 +1,5 @@
 # api/main.py
+from config import GROQ_MODEL
 from llm.generator import generate_answer
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -354,7 +355,7 @@ def health():
     """Returns basic system health info."""
     return {
         "status":    "healthy",
-        "model":     "llama-3.1-8b-instant",
+        "model":     GROQ_MODEL,
         "embedding": "all-MiniLM-L6-v2",
         "database":  "ChromaDB"
     }
